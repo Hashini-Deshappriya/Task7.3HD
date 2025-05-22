@@ -8,59 +8,28 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+       
+        stage('Build') {
             steps {
-                sh 'npm install'
+                sh 'mvn -B -DskipTests clean package'
             }
         }
-
-        stage('Run Tests') {
+        stage('Test') {
             steps {
-                sh 'npm test || true' // Allows pipeline to continue despite test failures
+                sh 'mvn test'
             }
             post {
-                success {
-                    emailext to: 'gghashini@gmail.com',
-                             subject: "Run Tests Stage: SUCCESS",
-                             body: "The Run Tests stage completed successfully.",
-                             attachLog: true
-                }
-                failure {
-                    emailext to: 'gghashini@gmail.com',
-                             subject: "Run Tests Stage: FAILURE",
-                             body: "The Run Tests stage failed.",
-                             attachLog: true
+                always {
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
         }
-
-        stage('Generate Coverage Report') {
+        stage('Deliver') { 
             steps {
-                sh 'npm run coverage || true'
+                sh './jenkins/scripts/deliver.sh' 
             }
         }
-
-        stage('NPM Audit (Security Scan)') {
-            steps {
-                sh 'npm audit || true' // This will show known CVEs in the output
-            }
-            post {
-                success {
-                    emailext to: 'gghashini@gmail.com',
-                             subject: "Security Scan: SUCCESS",
-                             body: "The security scan completed successfully.",
-                             attachLog: true
-                }
-                failure {
-                    emailext to: 'gghashini@gmail.com',
-                             subject: "Security Scan: FAILURE",
-                             body: "The security scan failed.",
-                             attachLog: true
-                }
-            }
-            
-        }
-        
     }
+        
 }
 
