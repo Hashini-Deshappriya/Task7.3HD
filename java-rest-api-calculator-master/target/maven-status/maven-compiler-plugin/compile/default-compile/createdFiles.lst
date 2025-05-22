@@ -1,0 +1,4 @@
+com/coralogix/calculator/CalculatorApplication.class
+com/coralogix/calculator/model/Result.class
+com/coralogix/calculator/AddController.class
+com/coralogix/calculator/services/AddService.class
